@@ -18,6 +18,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "idate")
     private Date createdDate;
@@ -32,4 +33,8 @@ public class Payment {
     @ManyToOne
     @JoinColumn(name = "buyer_id", referencedColumnName = "id", nullable = false)
     private Buyer buyer;
+
+    @OneToOne
+    @JoinColumn(name = "cart_id", referencedColumnName = "id", nullable = false)
+    private Cart cart;
 }

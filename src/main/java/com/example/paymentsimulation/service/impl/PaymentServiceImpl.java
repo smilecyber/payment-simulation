@@ -1,13 +1,7 @@
 package com.example.paymentsimulation.service.impl;
 
-import com.example.paymentsimulation.model.Buyer;
-import com.example.paymentsimulation.model.Merchant;
-import com.example.paymentsimulation.model.Payment;
-import com.example.paymentsimulation.model.PaymentDetail;
-import com.example.paymentsimulation.repository.BuyerRepository;
-import com.example.paymentsimulation.repository.MerchantRepository;
-import com.example.paymentsimulation.repository.PaymentDetailRepository;
-import com.example.paymentsimulation.repository.PaymentRepository;
+import com.example.paymentsimulation.model.*;
+import com.example.paymentsimulation.repository.*;
 import com.example.paymentsimulation.service.PaymentService;
 
 import java.math.BigDecimal;
@@ -20,24 +14,29 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BuyerRepository buyerRepository;
     private final PaymentDetailRepository paymentDetailRepository;
+    private final CartRepository cartRepository;
 
     public PaymentServiceImpl(MerchantRepository merchantRepository,
                               PaymentRepository paymentRepository,
                               BuyerRepository buyerRepository,
-                              PaymentDetailRepository paymentDetailRepository) {
+                              PaymentDetailRepository paymentDetailRepository,
+                              CartRepository cartRepository) {
         this.merchantRepository = merchantRepository;
         this.paymentRepository = paymentRepository;
         this.buyerRepository = buyerRepository;
         this.paymentDetailRepository = paymentDetailRepository;
+        this.cartRepository = cartRepository;
     }
 
     @Override
-    public void makePayment(Long merchantId, Long buyerId, BigDecimal amount) {
+    public void makePayment(Long merchantId, Long buyerId, Long cartId, BigDecimal amount) {
         Merchant merchant = merchantRepository.getById(merchantId);
         Buyer buyer = buyerRepository.getById(buyerId);
+        Cart cart = cartRepository.getById(cartId);
 
-        Payment payment = paymentRepository.save(Payment.builder().buyer(buyer).amount(amount).merchant(merchant)
-                .status(1).build());
+        Payment payment = paymentRepository.save(Payment.builder()
+                        .cart(cart).buyer(buyer).amount(amount)
+                        .merchant(merchant).status(1).build());
         PaymentDetail paymentDetail = createPaymentDetail(payment);
         paymentDetailRepository.save(paymentDetail);
     }
